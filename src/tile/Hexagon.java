@@ -68,6 +68,7 @@ public class Hexagon extends Polygon {
         }
         return pointsY;
     }
+
     public void setNeighbors (List<Hexagon> hexList, int spaceBetweenTiles) {
         neighbors = new LinkedList<>();
         Point2D[] neighborsCenterPoints = calculatePossibleNeighbors(spaceBetweenTiles);
@@ -83,27 +84,15 @@ public class Hexagon extends Polygon {
     private Point2D[] calculatePossibleNeighbors (double spaceBetweenTiles) {
         double centerPointX = centerPoint.getX();
         double centerPointY = centerPoint.getY();
-        double yAxisShiftBetweenTiles = Math.sqrt(0.75) * spaceBetweenTiles + 1.5 * radius;
-
-        Point2D[] neighborsCenterPoints = new Point2D[6];
-        neighborsCenterPoints[0] = new Point2D(
-                centerPointX + ((spaceBetweenTiles / 2) + innerRadius),
-                centerPointY - yAxisShiftBetweenTiles);
-        neighborsCenterPoints[1] = new Point2D(
-                centerPointX + (spaceBetweenTiles + (innerRadius * 2)),
-                centerPointY);
-        neighborsCenterPoints[2] = new Point2D(
-                centerPointX + ((spaceBetweenTiles / 2) + innerRadius),
-                centerPointY + yAxisShiftBetweenTiles);
-        neighborsCenterPoints[3] = new Point2D(
-                centerPointX - ((spaceBetweenTiles / 2) + innerRadius),
-                centerPointY + yAxisShiftBetweenTiles);
-        neighborsCenterPoints[4] = new Point2D(
-                centerPointX - (spaceBetweenTiles + (innerRadius * 2)),
-                centerPointY);
-        neighborsCenterPoints[5] = new Point2D(
-                centerPointX - ((spaceBetweenTiles / 2) + innerRadius),
-                (centerPointY - yAxisShiftBetweenTiles));
+        double shiftBetweenRows = Math.sqrt(0.75) * spaceBetweenTiles + 1.5 * radius;
+        Point2D[] neighborsCenterPoints = {
+            new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
+            new Point2D(centerPointX + (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
+            new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
+            new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
+            new Point2D(centerPointX - (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
+            new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
+        };
         return neighborsCenterPoints;
     }
 
@@ -118,6 +107,7 @@ public class Hexagon extends Polygon {
 
     public void strokeHexagon(GraphicsContext gc, Color color) {
         gc.setStroke(color);
+        gc.setLineWidth(6);
         gc.strokePolygon(getXPoints(), getYPoints(), 6);
     }
 }

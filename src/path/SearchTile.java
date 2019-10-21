@@ -2,12 +2,12 @@ package path;
 
 import tile.Hexagon;
 
-public class DistanceHex implements  Comparable<DistanceHex> {
+public class SearchTile implements  Comparable<SearchTile> {
     private final Hexagon HEX;
-    private final DistanceHex CALLER;
+    private final SearchTile CALLER;
     private final double DISTANCE;
 
-    public DistanceHex(Hexagon HEX, Hexagon target, DistanceHex caller) {
+    public SearchTile(Hexagon HEX, Hexagon target, SearchTile caller) {
         this.HEX = HEX;
         this.DISTANCE = HEX.getDistance(target.getCenterPoint());
         this.CALLER = caller;
@@ -17,22 +17,22 @@ public class DistanceHex implements  Comparable<DistanceHex> {
         return HEX;
     }
 
+    public SearchTile getCALLER() {
+        return CALLER;
+    }
+
     public double getDISTANCE() {
         return DISTANCE;
     }
 
     @Override
-    public int compareTo(DistanceHex distanceHex) {
-        if (DISTANCE > distanceHex.DISTANCE) {
+    public int compareTo(SearchTile searchTile) {
+        if (DISTANCE > searchTile.DISTANCE) {
             return 1;
-        } else if (DISTANCE < distanceHex.DISTANCE) {
+        } else if (DISTANCE < searchTile.DISTANCE) {
             return -1;
         } else {
             return 0;
         }
-    }
-
-    public DistanceHex getCALLER() {
-        return CALLER;
     }
 }
