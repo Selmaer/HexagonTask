@@ -10,10 +10,10 @@ Greedy Best first search
 */
 
 public class PathFinder {
-    PriorityQueue<SearchTile> queue = new PriorityQueue();
-    Set<Hexagon> set = new HashSet<>();
+    static PriorityQueue<SearchTile> queue = new PriorityQueue();
+    static Set<Hexagon> set = new HashSet<>();
 
-    public List<Hexagon> findPath(Hexagon origin, Hexagon target) throws NoPathException {
+    public static List<Hexagon> findPath(Hexagon origin, Hexagon target) throws NoPathException {
         LinkedList<Hexagon> pathHexagons= new LinkedList<>();
 
         if (origin == target) {
@@ -35,10 +35,12 @@ public class PathFinder {
             finder = finder.getCALLER();
         }
         pathHexagons.add(finder.getHex());
+        queue.clear();
+        set.clear();
         return pathHexagons;
     }
 
-    private PriorityQueue<SearchTile> addToQueue(List<Hexagon> neighborsList, SearchTile caller, Hexagon target) {
+    private static PriorityQueue<SearchTile> addToQueue(List<Hexagon> neighborsList, SearchTile caller, Hexagon target) {
         PriorityQueue<SearchTile> queue = new PriorityQueue<>();
         for (Hexagon hex : neighborsList) {
             SearchTile dh = new SearchTile(hex, target, caller);

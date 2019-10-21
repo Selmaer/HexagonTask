@@ -17,9 +17,9 @@ public class Tilemap {
     private static final int PROBABILITY_INDEX = 4;
     public final int WINDOW_WIDTH;
     public final int WINDOW_HEIGHT;
+    public final int SPACE_BETWEEN_TILES;
     public final int HEXAGON_RADIUS;
     private final double HEXAGON_INNER_RADIUS;
-    public final int SPACE_BETWEEN_TILES;
     private final int BUTTON_HEIGHT = 25;
 
     private final int MAX_ROWS;
@@ -36,6 +36,7 @@ public class Tilemap {
         this.MAX_ROWS = calculateMaxRows();
         this.MAX_TILES_PER_ROW = calculateMaxTiles();
         this.HEXAGON_LIST = createMap();
+        removeSeparateHexagons();
     }
 
     public Tilemap(SavedData savedData) {
@@ -48,6 +49,7 @@ public class Tilemap {
         this.MAX_ROWS = calculateMaxRows();
         this.MAX_TILES_PER_ROW = calculateMaxTiles();
         this.HEXAGON_LIST = createMap();
+        removeSeparateHexagons();
     }
 
     private List<Hexagon> createMap() {
@@ -64,7 +66,6 @@ public class Tilemap {
         for (Hexagon hex : hexList) {
             hex.setNeighbors(hexList, SPACE_BETWEEN_TILES);
         }
-//TODO        removeSeparateHexagons();
         return hexList;
     }
 
@@ -98,7 +99,7 @@ public class Tilemap {
         for (int y = 0; y < MAX_ROWS; y++) {
             for (int x = 0; x < MAX_TILES_PER_ROW; x++) {
                 double pointX = startingPointX + x * (HEXAGON_INNER_RADIUS * 2 + SPACE_BETWEEN_TILES) +
-                        (y % 2) * (HEXAGON_INNER_RADIUS + ((double)SPACE_BETWEEN_TILES / 2));
+                        (y % 2) * (HEXAGON_INNER_RADIUS + ((double) SPACE_BETWEEN_TILES / 2));
                 double pointY = startingPointY + y * (HEXAGON_RADIUS * 1.5 + Math.sqrt(0.75) * SPACE_BETWEEN_TILES);
 
                 pointList.add(new Point2D(pointX, pointY));
@@ -108,23 +109,31 @@ public class Tilemap {
     }
 
     private void removeSeparateHexagons() {
-        Hexagon centerHex = getCenterHexagon();
-        for (Hexagon hex : HEXAGON_LIST) {
-            PathFinder pathFinder = new PathFinder();
-            try {
-                pathFinder.findPath(hex, centerHex);
-            } catch (NoPathException e) {
-                HEXAGON_LIST.remove(hex);
-            }
+        List<Hexagon> separateHexagons = findSeparateHexagons();
+        for(Hexagon hex : separateHexagons) {
+            HEXAGON_LIST.remove(hex);
         }
     }
 
-    private Hexagon getCenterHexagon () {
-        Point2D point = new Point2D(WINDOW_WIDTH / 2, WINDOW_HEIGHT + BUTTON_HEIGHT / 2);
+    private List<Hexagon> findSeparateHexagons() {
+        List<Hexagon> separateHexagons = new LinkedList<>();
+        Hexagon centerHex = getCentralHexagon();
+        for (Hexagon hex : HEXAGON_LIST) {
+            try {
+                PathFinder.findPath(hex, centerHex);
+            } catch (NoPathException e) {
+                separateHexagons.add(hex);
+            }
+        }
+        return separateHexagons;
+    }
+
+    private Hexagon getCentralHexagon() {
+        Point2D point = new Point2D(WINDOW_WIDTH / 2, (WINDOW_HEIGHT + BUTTON_HEIGHT) / 2);
         return getClosestHexagon(point);
     }
 
-    public Hexagon getClosestHexagon (Point2D point) {
+    public Hexagon getClosestHexagon(Point2D point) {
         Hexagon hexagon = HEXAGON_LIST.get(0);
         double distance = WINDOW_WIDTH;
         for (Hexagon hex : HEXAGON_LIST) {

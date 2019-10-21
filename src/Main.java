@@ -25,6 +25,9 @@ public class Main extends Application {
     private final Integer SPACE_BETWEEN_TILES = 3;
     private final int HEXAGON_RADIUS = 20;
 
+    private final Color HEXAGON_COLOR = Color.DARKCYAN;
+    private final Color SELECTED_HEXAGON_COLOR = Color.DARKBLUE;
+
     private Tilemap map;
     private List<Hexagon> selectedHexagons = new ArrayList<>(2);
 
@@ -49,6 +52,18 @@ public class Main extends Application {
         mapCanvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
         actionCanvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+        setButtons();
+
+        drawMap();
+        responseToActivity();
+
+        root.getChildren().addAll(mapCanvas, actionCanvas, newButton, saveButton, loadButton);
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+
+    private void setButtons() {
         newButton = new Button("New map");
         saveButton = new Button("Save to JSON");
         loadButton = new Button("Load from JSON");
@@ -59,22 +74,12 @@ public class Main extends Application {
         loadButton.setDisable(true);
         saveButton.setLayoutX(100);
         loadButton.setLayoutX(200);
-
-        drawMap();
-        activityListener(actionCanvas);
-
-        root.getChildren().addAll(mapCanvas, actionCanvas, newButton, saveButton, loadButton);
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setResizable(false);
-
-        primaryStage.show();
     }
 
     private void drawMap() {
         clearCanvas(mapCanvas);
         clearCanvas(actionCanvas);
         GraphicsContext mapGC = mapCanvas.getGraphicsContext2D();
-        mapGC.setLineWidth(5);
 
         map = new Tilemap(mapCanvas, HEXAGON_RADIUS, SPACE_BETWEEN_TILES);
         map.drawMap(mapGC);
@@ -82,20 +87,19 @@ public class Main extends Application {
     private void drawMap(SavedData savedData) {
         clearCanvas(mapCanvas);
         clearCanvas(actionCanvas);
-        GraphicsContext mapGC = mapCanvas.getGraphicsContext2D();
 
         map = new Tilemap(savedData);
-        map.drawMap(mapGC);
+        map.drawMap(mapCanvas.getGraphicsContext2D());
     }
 
-    private void activityListener(Canvas actionCanvas) {
+    private void responseToActivity() {
         GraphicsContext actionGC = actionCanvas.getGraphicsContext2D();
         actionCanvas.toFront();
-        actionGC.setFill(Color.DARKCYAN);
-        actionGC.setStroke(Color.CORAL);
+        actionGC.setFill(HEXAGON_COLOR);
 
         newButton.setOnMouseClicked( e -> {
             saveButton.setDisable(true);
+            selectedHexagons.clear();
             drawMap();
         });
 
@@ -124,8 +128,8 @@ public class Main extends Application {
                     selectedHexagons.clear();
                     saveButton.setDisable(true);
                 }
-                hex.fillHexagon(actionGC, Color.CHOCOLATE);
-                hex.strokeHexagon(actionGC, Color.CHOCOLATE);
+                hex.fillHexagon(actionGC, SELECTED_HEXAGON_COLOR);
+                hex.strokeHexagon(actionGC, SELECTED_HEXAGON_COLOR);
                 selectedHexagons.add(hex);
                 if (selectedHexagons.size() == 2) {
                     showPath(selectedHexagons);
@@ -141,15 +145,14 @@ public class Main extends Application {
 
     private void showPath(List<Hexagon> selectedHexagons) {
         GraphicsContext actionGC = actionCanvas.getGraphicsContext2D();
-        PathFinder pathFinder = new PathFinder();
 
         List<Hexagon> pathList;
         try {
-            pathList = pathFinder.findPath(selectedHexagons.get(0), selectedHexagons.get(1));
-            pathList.get(0).fillHexagon(actionGC, Color.CHOCOLATE);
-            pathList.get(pathList.size() - 1).fillHexagon(actionGC, Color.CHOCOLATE);
+            pathList = PathFinder.findPath(selectedHexagons.get(0), selectedHexagons.get(1));
+            pathList.get(0).fillHexagon(actionGC, SELECTED_HEXAGON_COLOR);
+            pathList.get(pathList.size() - 1).fillHexagon(actionGC, SELECTED_HEXAGON_COLOR);
             for (Hexagon hexagon : pathList) {
-                hexagon.strokeHexagon(actionGC, Color.CHOCOLATE);
+                hexagon.strokeHexagon(actionGC, SELECTED_HEXAGON_COLOR);
             }
             saveButton.setDisable(false);
         } catch (NoPathException ex) {
