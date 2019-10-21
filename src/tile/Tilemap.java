@@ -13,14 +13,13 @@ import java.util.List;
 import java.util.Random;
 
 public class Tilemap {
-    public final int SEED;
-    private static final int PROBABILITY_INDEX = 4;
+    public final int SEED; //seed is useful while importing/exporting map to/from JSON
     public final int WINDOW_WIDTH;
     public final int WINDOW_HEIGHT;
     public final int SPACE_BETWEEN_TILES;
     public final int HEXAGON_RADIUS;
     private final double HEXAGON_INNER_RADIUS;
-    private final int BUTTON_HEIGHT = 25;
+    private final int BUTTON_HEIGHT = 25; //is used to avoid buttons placed over hexagons
 
     private final int MAX_ROWS;
     private final int MAX_TILES_PER_ROW;
@@ -52,12 +51,32 @@ public class Tilemap {
         removeSeparateHexagons();
     }
 
+    public void drawMap(GraphicsContext gc) {
+        for (Hexagon hex : HEXAGON_LIST) {
+            hex.fillHexagon(gc, Color.DARKCYAN);
+        }
+    }
+
+    /*This method returns hexagon that is closest to the point he got as an argument*/
+    public Hexagon getClosestHexagon(Point2D point) {
+        Hexagon hexagon = HEXAGON_LIST.get(0);
+        double distance = WINDOW_WIDTH;
+        for (Hexagon hex : HEXAGON_LIST) {
+            double dist = hex.getDistance(point);
+            if (dist < distance) {
+                distance = dist;
+                hexagon = hex;
+            }
+        }
+        return hexagon;
+    }
+
     private List<Hexagon> createMap() {
         Random rand = new Random(SEED);
         List<Hexagon> hexList = new LinkedList<>();
         List<Point2D> possiblePoints = getAllPossibleCenters();
         for (Point2D point : possiblePoints) {
-            int randomCoefficient = rand.nextInt((int) (Math.pow(PROBABILITY_INDEX, 2)));
+            int randomCoefficient = rand.nextInt(16);
             int creationProbability = getCreationProbability(point);
             if (randomCoefficient <= creationProbability) {
                 hexList.add(new Hexagon(point, HEXAGON_RADIUS));
@@ -69,11 +88,13 @@ public class Tilemap {
         return hexList;
     }
 
+    /*To find the probability to create each hexagon I'm using this function: f(x) = -(x^2/z - 2)^4 + 16,
+     * where x is a position of the hexagon on axis (X or Y) and z is a total length of the axis. The graph
+     * of this function gives almost 100% probability (the index is 16) of hexagon creation near the center
+     * of the canvas and rapid decrease of probability towards its edges. */
     private int getCreationProbability(Point2D point) {
-        int probX = (int) (Math.pow(PROBABILITY_INDEX, 2) -
-                Math.pow((PROBABILITY_INDEX * point.getX() / WINDOW_WIDTH) - Math.sqrt(PROBABILITY_INDEX), PROBABILITY_INDEX));
-        int probY = (int) (Math.pow(PROBABILITY_INDEX, 2) -
-                Math.pow((PROBABILITY_INDEX * point.getY() / (WINDOW_HEIGHT - BUTTON_HEIGHT)) - Math.sqrt(PROBABILITY_INDEX), PROBABILITY_INDEX));
+        int probX = (int) (16 - Math.pow((4 * point.getX() / WINDOW_WIDTH) - 2, 4));
+        int probY = (int) (16 - Math.pow((4 * point.getY() / (WINDOW_HEIGHT - BUTTON_HEIGHT)) - 2, 4));
         return Math.min(probX, probY);
     }
 
@@ -89,6 +110,7 @@ public class Tilemap {
                         (Math.sqrt(0.75) * SPACE_BETWEEN_TILES + 1.5 * HEXAGON_RADIUS));
     }
 
+    /*This method returns center points of all possible hexagons on the canvas*/
     private List<Point2D> getAllPossibleCenters() {
         Point2D startingPoint = new Point2D(
                 HEXAGON_RADIUS + SPACE_BETWEEN_TILES,
@@ -108,6 +130,8 @@ public class Tilemap {
         return pointList;
     }
 
+    /*This method removes all hexagons that are separated from the main map
+     * and therefore there is no path to find them*/
     private void removeSeparateHexagons() {
         List<Hexagon> separateHexagons = findSeparateHexagons();
         for(Hexagon hex : separateHexagons) {
@@ -131,24 +155,5 @@ public class Tilemap {
     private Hexagon getCentralHexagon() {
         Point2D point = new Point2D(WINDOW_WIDTH / 2, (WINDOW_HEIGHT + BUTTON_HEIGHT) / 2);
         return getClosestHexagon(point);
-    }
-
-    public Hexagon getClosestHexagon(Point2D point) {
-        Hexagon hexagon = HEXAGON_LIST.get(0);
-        double distance = WINDOW_WIDTH;
-        for (Hexagon hex : HEXAGON_LIST) {
-            double dist = hex.getDistance(point);
-            if (dist < distance) {
-                distance = dist;
-                hexagon = hex;
-            }
-        }
-        return hexagon;
-    }
-
-    public void drawMap(GraphicsContext gc) {
-        for (Hexagon hex : HEXAGON_LIST) {
-            hex.fillHexagon(gc, Color.DARKCYAN);
-        }
     }
 }

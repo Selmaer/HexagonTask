@@ -2,7 +2,7 @@ package path;
 
 import tile.Hexagon;
 
-public class SearchTile implements  Comparable<SearchTile> {
+public class SearchTile implements Comparable<SearchTile> {
     private final Hexagon HEX;
     private final SearchTile CALLER;
     private final double DISTANCE;
@@ -19,10 +19,6 @@ public class SearchTile implements  Comparable<SearchTile> {
 
     public SearchTile getCALLER() {
         return CALLER;
-    }
-
-    public double getDISTANCE() {
-        return DISTANCE;
     }
 
     @Override

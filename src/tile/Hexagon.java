@@ -10,13 +10,16 @@ import java.util.List;
 
 public class Hexagon extends Polygon {
     private LinkedList<Hexagon> neighbors;
-    private final int radius;
     private final Point2D centerPoint;
-
+    private final int radius;
     private final double innerRadius;
 
-    private double calculateInnerRadius(int radius) {
-        return Math.sqrt(0.75 * Math.pow(radius, 2));
+    public Hexagon(Point2D centerPoint, int radius) {
+        this.radius = radius;
+        this.centerPoint = centerPoint;
+
+        this.innerRadius = Math.sqrt(0.75 * Math.pow(radius, 2));
+        setPoints(centerPoint);
     }
 
     public double getDistance(Point2D point) {
@@ -28,48 +31,11 @@ public class Hexagon extends Polygon {
         return Math.hypot(x1 - x2, y1 - y2);
     }
 
-    private void setPoints(Point2D centerPoint) {
-        double centerPointX = centerPoint.getX();
-        double centerPointY = centerPoint.getY();
-
-        getPoints().addAll(
-                centerPointX, centerPointY - radius,
-                centerPointX + innerRadius, centerPointY - (radius / 2),
-                centerPointX + innerRadius, centerPointY + (radius / 2),
-                centerPointX, centerPointY + radius,
-                centerPointX - innerRadius, centerPointY + (radius / 2),
-                centerPointX - innerRadius, centerPointY - (radius / 2)
-        );
-    }
-
     public LinkedList<Hexagon> getNeighbors() {
         return neighbors;
     }
 
-    public Hexagon (Point2D centerPoint, int radius) {
-        this.radius = radius;
-        this.centerPoint = centerPoint;
-
-        this.innerRadius = calculateInnerRadius(radius);
-        setPoints(centerPoint);
-    }
-
-    private double[] getXPoints() {
-        double[] pointsX = new double[6];
-        for (int i = 0; i < pointsX.length; i++) {
-            pointsX[i] = getPoints().get(i * 2);
-        }
-        return pointsX;
-    }
-    private double[] getYPoints() {
-        double[] pointsY = new double[6];
-        for (int i = 0; i < pointsY.length; i++) {
-            pointsY[i] = getPoints().get(i * 2 + 1);
-        }
-        return pointsY;
-    }
-
-    public void setNeighbors (List<Hexagon> hexList, int spaceBetweenTiles) {
+    public void setNeighbors(List<Hexagon> hexList, int spaceBetweenTiles) {
         neighbors = new LinkedList<>();
         Point2D[] neighborsCenterPoints = calculatePossibleNeighbors(spaceBetweenTiles);
         for (Point2D point : neighborsCenterPoints) {
@@ -81,25 +47,6 @@ public class Hexagon extends Polygon {
         }
     }
 
-    private Point2D[] calculatePossibleNeighbors (double spaceBetweenTiles) {
-        double centerPointX = centerPoint.getX();
-        double centerPointY = centerPoint.getY();
-        double shiftBetweenRows = Math.sqrt(0.75) * spaceBetweenTiles + 1.5 * radius;
-        Point2D[] neighborsCenterPoints = {
-            new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
-            new Point2D(centerPointX + (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
-            new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
-            new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
-            new Point2D(centerPointX - (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
-            new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
-        };
-        return neighborsCenterPoints;
-    }
-
-    public Point2D getCenterPoint() {
-        return centerPoint;
-    }
-
     public void fillHexagon(GraphicsContext gc, Color color) {
         gc.setFill(color);
         gc.fillPolygon(getXPoints(), getYPoints(), 6);
@@ -109,5 +56,54 @@ public class Hexagon extends Polygon {
         gc.setStroke(color);
         gc.setLineWidth(6);
         gc.strokePolygon(getXPoints(), getYPoints(), 6);
+    }
+
+    private Point2D[] calculatePossibleNeighbors(double spaceBetweenTiles) {
+        double centerPointX = centerPoint.getX();
+        double centerPointY = centerPoint.getY();
+        double shiftBetweenRows = Math.sqrt(0.75) * spaceBetweenTiles + 1.5 * radius;
+        Point2D[] neighborsCenterPoints = {
+                new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
+                new Point2D(centerPointX + (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
+                new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
+                new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
+                new Point2D(centerPointX - (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
+                new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
+        };
+        return neighborsCenterPoints;
+    }
+
+    /*This method sets all perimeter points of hexagon using its central point*/
+    private void setPoints(Point2D centerPoint) {
+        double centerPointX = centerPoint.getX();
+        double centerPointY = centerPoint.getY();
+        getPoints().addAll(
+                centerPointX, centerPointY - radius,
+                centerPointX + innerRadius, centerPointY - (radius / 2),
+                centerPointX + innerRadius, centerPointY + (radius / 2),
+                centerPointX, centerPointY + radius,
+                centerPointX - innerRadius, centerPointY + (radius / 2),
+                centerPointX - innerRadius, centerPointY - (radius / 2)
+        );
+    }
+
+    private double[] getXPoints() {
+        double[] pointsX = new double[6];
+        for (int i = 0; i < pointsX.length; i++) {
+            pointsX[i] = getPoints().get(i * 2);
+        }
+        return pointsX;
+    }
+
+    private double[] getYPoints() {
+        double[] pointsY = new double[6];
+        for (int i = 0; i < pointsY.length; i++) {
+            pointsY[i] = getPoints().get(i * 2 + 1);
+        }
+        return pointsY;
+    }
+
+    public Point2D getCenterPoint() {
+        return centerPoint;
     }
 }

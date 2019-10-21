@@ -6,6 +6,8 @@ import tile.Tilemap;
 
 import java.util.List;
 
+/*This is the object I use to save data into JSON. For now there is no need to save more than seed and selected hexagons,
+ * but to import to and then export data from external file all the fields may be necessary*/
 public class SavedData {
     public final int SEED;
     public final int WINDOW_WIDTH;
