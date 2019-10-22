@@ -35,9 +35,9 @@ public class Hexagon extends Polygon {
         return neighbors;
     }
 
-    public void setNeighbors(List<Hexagon> hexList, int spaceBetweenTiles) {
+    public void setNeighbors(List<Hexagon> hexList) {
         neighbors = new LinkedList<>();
-        Point2D[] neighborsCenterPoints = calculatePossibleNeighbors(spaceBetweenTiles);
+        Point2D[] neighborsCenterPoints = calculatePossibleNeighbors();
         for (Point2D point : neighborsCenterPoints) {
             for (Hexagon hex : hexList) {
                 if (hex.contains(point.getX(), point.getY())) {
@@ -54,23 +54,21 @@ public class Hexagon extends Polygon {
 
     public void strokeHexagon(GraphicsContext gc, Color color) {
         gc.setStroke(color);
-        gc.setLineWidth(6);
         gc.strokePolygon(getXPoints(), getYPoints(), 6);
     }
 
-    private Point2D[] calculatePossibleNeighbors(double spaceBetweenTiles) {
+    private Point2D[] calculatePossibleNeighbors() {
         double centerPointX = centerPoint.getX();
         double centerPointY = centerPoint.getY();
-        double shiftBetweenRows = Math.sqrt(0.75) * spaceBetweenTiles + 1.5 * radius;
-        Point2D[] neighborsCenterPoints = {
-                new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
-                new Point2D(centerPointX + (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
-                new Point2D(centerPointX + ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
-                new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY + shiftBetweenRows),
-                new Point2D(centerPointX - (spaceBetweenTiles + (innerRadius * 2)), centerPointY),
-                new Point2D(centerPointX - ((spaceBetweenTiles / 2) + innerRadius), centerPointY - shiftBetweenRows),
+        double shiftBetweenRows = 1.5 * radius;
+        return new Point2D[]{
+                new Point2D(centerPointX + innerRadius, centerPointY - shiftBetweenRows),
+                new Point2D(centerPointX + (innerRadius * 2), centerPointY),
+                new Point2D(centerPointX + innerRadius, centerPointY + shiftBetweenRows),
+                new Point2D(centerPointX - innerRadius, centerPointY + shiftBetweenRows),
+                new Point2D(centerPointX - (innerRadius * 2), centerPointY),
+                new Point2D(centerPointX - innerRadius, centerPointY - shiftBetweenRows),
         };
-        return neighborsCenterPoints;
     }
 
     /*This method sets all perimeter points of hexagon using its central point*/

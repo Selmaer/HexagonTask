@@ -22,7 +22,6 @@ import java.util.List;
 public class Main extends Application {
     private final int WINDOW_WIDTH = 800;
     private final int WINDOW_HEIGHT = 600;
-    private final Integer SPACE_BETWEEN_TILES = 3;
     private final int HEXAGON_RADIUS = 20;
 
     private final Color HEXAGON_GRID_COLOR = Color.DARKCYAN;
@@ -83,7 +82,8 @@ public class Main extends Application {
         clearCanvas(actionCanvas);
         GraphicsContext mapGC = mapCanvas.getGraphicsContext2D();
 
-        map = new Tilemap(mapCanvas, HEXAGON_RADIUS, SPACE_BETWEEN_TILES);
+        map = new Tilemap(mapCanvas, HEXAGON_RADIUS);
+        mapGC.setLineWidth(3);
         map.drawMap(mapGC);
     }
 
@@ -131,6 +131,7 @@ public class Main extends Application {
                     selectedHexagons.clear();
                     saveButton.setDisable(true);
                 }
+                actionGC.setLineWidth(4);
                 hex.fillHexagon(actionGC, START_HEXAGON_COLOR);
                 hex.strokeHexagon(actionGC, START_HEXAGON_COLOR);
                 selectedHexagons.add(hex);
@@ -152,6 +153,11 @@ public class Main extends Application {
         List<Hexagon> pathList;
         try {
             pathList = PathFinder.findPath(selectedHexagons.get(0), selectedHexagons.get(1));
+            actionGC.setLineWidth(4);
+
+            for (Hexagon hexagon : pathList) {
+                hexagon.strokeHexagon(actionGC, PATH_COLOR);
+            }
 
             Hexagon startHex = pathList.remove(pathList.size() - 1);
             startHex.fillHexagon(actionGC, START_HEXAGON_COLOR);
@@ -161,9 +167,6 @@ public class Main extends Application {
             finishHex.fillHexagon(actionGC, FINISH_HEXAGON_COLOR);
             finishHex.strokeHexagon(actionGC, FINISH_HEXAGON_COLOR);
 
-            for (Hexagon hexagon : pathList) {
-                hexagon.strokeHexagon(actionGC, PATH_COLOR);
-            }
             saveButton.setDisable(false);
         } catch (NoPathException ex) {
             System.out.println(ex.getMessage());

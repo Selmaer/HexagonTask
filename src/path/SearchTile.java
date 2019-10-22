@@ -23,12 +23,6 @@ public class SearchTile implements Comparable<SearchTile> {
 
     @Override
     public int compareTo(SearchTile searchTile) {
-        if (DISTANCE > searchTile.DISTANCE) {
-            return 1;
-        } else if (DISTANCE < searchTile.DISTANCE) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Double.compare(DISTANCE, searchTile.DISTANCE);
     }
 }
