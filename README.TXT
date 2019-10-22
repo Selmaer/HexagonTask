@@ -1,0 +1,2 @@
+# HexagonTask
+The task here was to create an app that displays randomly generated hexagon map. First click on a hexagon should highlight it, second click should highlight second hexagon and show the shortest path to the first one. Third click should highlight hexagon and reset the previously highlighted ones and the path between them. Also there should be the way to import/export map with highlighted hexagons and path to/from JSON.
