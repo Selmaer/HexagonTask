@@ -5,12 +5,8 @@ import tile.Hexagon;
 
 import java.util.*;
 
-/*
-Greedy best first search algorithm
-*/
-
 public class PathFinder {
-    private static PriorityQueue<SearchTile> queue = new PriorityQueue();
+    private static Queue<SearchTile> queue = new LinkedList<>();
     private static Set<Hexagon> set = new HashSet<>();
 
     public static List<Hexagon> findPath(Hexagon origin, Hexagon target) throws NoPathException {
